@@ -1,22 +1,29 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: Arial;
     text-align: center;
-    background-color: #f2f2f2;
-    margin: 0;
-    padding: 20px;
+    background-color: #eef2f7;
 }
 
 h1 {
     color: #2c3e50;
-    margin-bottom: 30px;
 }
 
-.card {
+.tree {
+    display: inline-block;
+    margin-top: 20px;
+}
+
+.node {
     background: white;
-    padding: 15px;
+    padding: 12px;
     margin: 10px auto;
     width: 200px;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    border-radius: 10px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
     font-size: 18px;
+}
+
+.line {
+    font-size: 20px;
+    color: #555;
 }
