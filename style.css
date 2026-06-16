@@ -1,7 +1,7 @@
 body {
     font-family: Arial;
     text-align: center;
-    background: #eef2f7;
+    background: linear-gradient(to bottom, #eef2f7, #ffffff);
 }
 
 h1 {
@@ -20,27 +20,28 @@ h1 {
     display: flex;
     justify-content: center;
     gap: 25px;
-    margin: 10px 0;
+    margin: 12px 0;
 }
 
+/* family member box */
 .node {
     background: white;
     padding: 14px 18px;
-    width: 180px;
+    width: 160px;
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: 0.3s;
 }
 
-/* vertical line */
-.v-line {
+/* hover effect */
+.node:hover {
+    transform: scale(1.05);
+    cursor: pointer;
+}
+
+/* connector line */
+.connector {
     width: 2px;
-    height: 30px;
-    background: #555;
-}
-
-/* horizontal line */
-.h-line {
-    width: 220px;
-    height: 2px;
+    height: 25px;
     background: #555;
 }
