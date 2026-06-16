@@ -1,5 +1,5 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: Arial;
     text-align: center;
     background: #eef2f7;
 }
@@ -15,26 +15,32 @@ h1 {
     align-items: center;
 }
 
-.generation {
+.level {
     display: flex;
-    justify-content: center;
     gap: 30px;
+    justify-content: center;
     margin: 10px 0;
 }
 
 .node {
     background: white;
-    padding: 14px 20px;
+    padding: 14px 18px;
     width: 180px;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    font-size: 16px;
-    position: relative;
 }
 
-/* vertical connector */
-.line {
+/* vertical line */
+.v-line {
     width: 2px;
-    height: 30px;
+    height: 25px;
     background: #555;
+}
+
+/* horizontal line */
+.h-line {
+    width: 200px;
+    height: 2px;
+    background: #555;
+    margin: 0 auto;
 }
