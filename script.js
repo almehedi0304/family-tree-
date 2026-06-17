@@ -11,62 +11,50 @@ function getChildren(id) {
   return family.filter(p => p.father === id || p.mother === id);
 }
 
-/* ================= TREE LAYOUT ================= */
+/* ================= TREE LEVEL SYSTEM ================= */
 
-function render(list = family) {
+function render(data = family) {
   tree.innerHTML = "";
 
-  const roots = family.filter(p => !p.father && !p.mother);
+  let levels = [];
 
-  const levelMap = new Map();
+  let root = family.filter(p => !p.father && !p.mother);
+  levels.push(root);
 
-  function addToLevel(level, person) {
-    if (!levelMap.has(level)) levelMap.set(level, []);
-    levelMap.get(level).push(person);
-  }
+  let current = root;
 
-  /* LEVEL 0 = ROOTS */
-  roots.forEach(p => addToLevel(0, p));
+  // build levels step by step
+  for (let i = 0; i < 5; i++) {
+    let next = [];
 
-  /* LEVEL 1+ = CHILDREN (simple hierarchy) */
-  let currentLevel = 0;
-  let queue = [...roots];
-
-  while (queue.length > 0 && currentLevel < 5) {
-    let nextQueue = [];
-
-    queue.forEach(parent => {
-      const children = getChildren(parent.id);
-
-      children.forEach(c => {
-        addToLevel(currentLevel + 1, c);
-        nextQueue.push(c);
-      });
+    current.forEach(p => {
+      let kids = getChildren(p.id);
+      next.push(...kids);
     });
 
-    queue = nextQueue;
-    currentLevel++;
+    if (next.length === 0) break;
+
+    levels.push(next);
+    current = next;
   }
 
-  /* RENDER LEVELS */
-  [...levelMap.keys()]
-    .sort((a, b) => a - b)
-    .forEach(level => {
-      const levelDiv = document.createElement("div");
-      levelDiv.className = "level";
+  // render levels
+  levels.forEach(level => {
+    const div = document.createElement("div");
+    div.className = "level";
 
-      levelMap.get(level).forEach(p => {
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerText = p.name;
+    level.forEach(p => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `<b>${p.name}</b>`;
 
-        card.onclick = () => showProfile(p);
+      card.onclick = () => showProfile(p);
 
-        levelDiv.appendChild(card);
-      });
-
-      tree.appendChild(levelDiv);
+      div.appendChild(card);
     });
+
+    tree.appendChild(div);
+  });
 }
 
 /* ================= PROFILE ================= */
@@ -82,10 +70,12 @@ function showProfile(p) {
   `;
 }
 
-/* ================= SEARCH (UNCHANGED, SAFE) ================= */
+/* ================= SEARCH ================= */
 
 search.addEventListener("input", (e) => {
   const val = e.target.value.toLowerCase().trim();
+
+  suggestions.innerHTML = "";
 
   if (!val) {
     suggestions.style.display = "none";
@@ -97,7 +87,6 @@ search.addEventListener("input", (e) => {
     p.name.toLowerCase().includes(val)
   );
 
-  suggestions.innerHTML = "";
   suggestions.style.display = "block";
 
   matches.forEach(p => {
