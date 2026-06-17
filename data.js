@@ -1,10 +1,18 @@
 {
-  id: 25,
+  id: 10,
   name: "আব্দুল করিম",
-  gender: "male",
+  father: null,
+  mother: null
+},
+{
+  id: 11,
+  name: "রহিমা খাতুন",
+  father: null,
+  mother: null
+},
+{
+  id: 1,
+  name: "মেহেদী",
   father: 10,
-  mother: 11,
-  birthYear: 1965,
-  photo: "images/karim.jpg"
+  mother: 11
 }
-];
