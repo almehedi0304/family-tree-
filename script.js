@@ -70,3 +70,12 @@ function render() {
     tree.appendChild(block);
   });
 }
+function showProfile(p) {
+  profile.innerHTML = `
+    <h2>${p.name}</h2>
+    <p>👨 বাবা: ${getPerson(p.father)?.name || "অজানা"}</p>
+    <p>👩 মা: ${getPerson(p.mother)?.name || "অজানা"}</p>
+  `;
+}
+
+render();
