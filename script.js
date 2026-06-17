@@ -2,9 +2,7 @@ const tree = document.getElementById("tree");
 const profile = document.getElementById("profile");
 const search = document.getElementById("search");
 
-/* ALWAYS USE FULL FAMILY AS SOURCE */
-let sourceData = family;
-
+/* always use full dataset */
 function getPerson(id) {
   return family.find(p => p.id === id);
 }
@@ -13,10 +11,13 @@ function getChildren(id) {
   return family.filter(p => p.father === id || p.mother === id);
 }
 
-function render(list = family) {
+/* GLOBAL SAFE RENDER */
+function render(data = family) {
   tree.innerHTML = "";
 
-  const roots = list.filter(p => !p.father && !p.mother);
+  const roots = family.filter(p => !p.father && !p.mother);
+
+  let secondLevel = [];
 
   function makeLevel(items) {
     const level = document.createElement("div");
@@ -26,10 +27,7 @@ function render(list = family) {
       const card = document.createElement("div");
       card.className = "card";
 
-      /* BOX STYLE OUTPUT */
-      card.innerHTML = `
-        <div><b>${p.name}</b></div>
-      `;
+      card.innerHTML = `<b>${p.name}</b>`;
 
       card.onclick = () => showProfile(p);
 
@@ -39,18 +37,18 @@ function render(list = family) {
     tree.appendChild(level);
   }
 
-  /* ROOT LEVEL */
+  /* LEVEL 1 */
   makeLevel(roots);
 
-  /* CHILD LEVEL */
-  let children = [];
+  /* LEVEL 2 (children) */
   roots.forEach(r => {
-    children = children.concat(getChildren(r.id));
+    secondLevel = secondLevel.concat(getChildren(r.id));
   });
 
-  if (children.length) makeLevel(children);
+  if (secondLevel.length) makeLevel(secondLevel);
 }
 
+/* PROFILE */
 function showProfile(p) {
   const father = getPerson(p.father);
   const mother = getPerson(p.mother);
@@ -65,7 +63,7 @@ function showProfile(p) {
   `;
 }
 
-/* 🔥 SIMPLE WORKING SEARCH */
+/* 🔍 SEARCH (SAFE + STABLE) */
 search.addEventListener("input", (e) => {
   const val = e.target.value.toLowerCase().trim();
 
