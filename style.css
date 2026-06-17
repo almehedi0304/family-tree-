@@ -23,6 +23,8 @@ input {
   flex-direction: column;
   align-items: center;
   gap: 20px;
+  position: relative;
+  z-index: 2;
 }
 
 .level {
@@ -39,11 +41,22 @@ input {
   box-shadow: 0 0 15px rgba(0,0,0,0.4);
   cursor: pointer;
   transition: 0.3s;
+  position: relative;
+  z-index: 3;
 }
 
 .card:hover {
   transform: scale(1.05);
   background: rgba(255,255,255,0.15);
+}
+
+#lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
 }
 
 .hidden {
@@ -60,21 +73,6 @@ input {
   backdrop-filter: blur(20px);
   padding: 20px;
   border-radius: 15px;
+  z-index: 10;
 }
-#tree {
-  position: relative;
-}
-
-.card {
-  position: relative;
-  z-index: 2;
-}
-
-#lines {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
 }
