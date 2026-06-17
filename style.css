@@ -1,4 +1,5 @@
 body {
+  margin: 0;
   font-family: Arial;
   background: #0b1220;
   color: white;
@@ -23,7 +24,6 @@ input {
 .level {
   display: flex;
   gap: 15px;
-  justify-content: center;
 }
 
 .card {
@@ -36,7 +36,6 @@ input {
 
 .card:hover {
   background: rgba(255,255,255,0.2);
-  transform: scale(1.05);
 }
 
 #suggestions {
@@ -56,8 +55,4 @@ input {
 
 .suggestion-item:hover {
   background: rgba(255,255,255,0.2);
-}
-
-#profile {
-  margin-top: 20px;
 }
