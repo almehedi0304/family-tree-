@@ -15,7 +15,7 @@ function render(list = family) {
 
   const roots = list.filter(p => !p.father && !p.mother);
 
-  function createLevel(items) {
+  function makeLevel(items) {
     const level = document.createElement("div");
     level.className = "level";
 
@@ -32,14 +32,14 @@ function render(list = family) {
     tree.appendChild(level);
   }
 
-  createLevel(roots);
+  makeLevel(roots);
 
   let children = [];
   roots.forEach(r => {
     children = children.concat(getChildren(r.id));
   });
 
-  createLevel(children);
+  if (children.length) makeLevel(children);
 }
 
 function showProfile(p) {
@@ -53,15 +53,20 @@ function showProfile(p) {
   `;
 }
 
-/* 🔥 SIMPLE GUARANTEED SEARCH */
+/* 🔥 GUARANTEED WORKING SEARCH */
 search.addEventListener("input", (e) => {
   const val = e.target.value.toLowerCase().trim();
+
+  if (!val) {
+    render(family);
+    return;
+  }
 
   const filtered = family.filter(p =>
     p.name.toLowerCase().includes(val)
   );
 
-  render(filtered.length ? filtered : family);
+  render(filtered);
 });
 
 render();
