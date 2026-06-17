@@ -1,27 +1,21 @@
 const family = [
   {
-    name: "দাদা",
-    image: "https://via.placeholder.com/80",
-    generation: 1
+    id: 1,
+    name: "মেহেদী",
+    father: null,
+    mother: null
   },
   {
-    name: "দাদী",
-    image: "https://via.placeholder.com/80",
-    generation: 1
+    id: 2,
+    name: "সাওদা",
+    father: null,
+    mother: null
   },
   {
-    name: "মেহেদী (বাবা)",
-    image: "https://via.placeholder.com/80",
-    generation: 2
-  },
-  {
-    name: "সাওদা (মা)",
-    image: "https://via.placeholder.com/80",
-    generation: 2
-  },
-  {
+    id: 3,
     name: "সায়ন",
-    image: "https://via.placeholder.com/80",
-    generation: 3
+    father: 1,
+    mother: 2
   }
+];
 ];
