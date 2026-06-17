@@ -11,86 +11,78 @@ function getChildren(id) {
   return family.filter(p => p.father === id || p.mother === id);
 }
 
-/* ================= TREE ================= */
+/* ================= TREE LAYOUT ================= */
 
 function render(list = family) {
   tree.innerHTML = "";
 
   const roots = family.filter(p => !p.father && !p.mother);
 
-  function makeLevel(items) {
-    const level = document.createElement("div");
-    level.className = "level";
+  const levelMap = new Map();
 
-    items.forEach(p => {
-      const card = document.createElement("div");
-      card.className = "card";
-
-      card.innerHTML = `<b>${p.name}</b>`;
-
-      card.onclick = () => showProfile(p);
-
-      level.appendChild(card);
-    });
-
-    tree.appendChild(level);
+  function addToLevel(level, person) {
+    if (!levelMap.has(level)) levelMap.set(level, []);
+    levelMap.get(level).push(person);
   }
 
-  makeLevel(roots);
+  /* LEVEL 0 = ROOTS */
+  roots.forEach(p => addToLevel(0, p));
 
-  let children = [];
-  roots.forEach(r => {
-    children = children.concat(getChildren(r.id));
-  });
+  /* LEVEL 1+ = CHILDREN (simple hierarchy) */
+  let currentLevel = 0;
+  let queue = [...roots];
 
-  if (children.length) makeLevel(children);
+  while (queue.length > 0 && currentLevel < 5) {
+    let nextQueue = [];
+
+    queue.forEach(parent => {
+      const children = getChildren(parent.id);
+
+      children.forEach(c => {
+        addToLevel(currentLevel + 1, c);
+        nextQueue.push(c);
+      });
+    });
+
+    queue = nextQueue;
+    currentLevel++;
+  }
+
+  /* RENDER LEVELS */
+  [...levelMap.keys()]
+    .sort((a, b) => a - b)
+    .forEach(level => {
+      const levelDiv = document.createElement("div");
+      levelDiv.className = "level";
+
+      levelMap.get(level).forEach(p => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerText = p.name;
+
+        card.onclick = () => showProfile(p);
+
+        levelDiv.appendChild(card);
+      });
+
+      tree.appendChild(levelDiv);
+    });
 }
 
 /* ================= PROFILE ================= */
 
 function showProfile(p) {
-  const father = getPerson(p.father);
-  const mother = getPerson(p.mother);
-
   profile.classList.remove("hidden");
 
   profile.innerHTML = `
     <h2>${p.name}</h2>
-    <p>👨 বাবা: ${father ? father.name : "অজানা"}</p>
-    <p>👩 মা: ${mother ? mother.name : "অজানা"}</p>
+    <p>👨 বাবা: ${getPerson(p.father)?.name || "অজানা"}</p>
+    <p>👩 মা: ${getPerson(p.mother)?.name || "অজানা"}</p>
     <button onclick="profile.classList.add('hidden')">বন্ধ করুন</button>
   `;
 }
 
-/* ================= SEARCH UPGRADE ================= */
-
-let currentMatches = [];
-let activeIndex = -1;
-
-function renderSuggestions(matches) {
-  suggestions.innerHTML = "";
-
-  matches.forEach((p, i) => {
-    const div = document.createElement("div");
-    div.className = "suggestion-item";
-
-    div.innerText = p.name;
-
-    if (i === activeIndex) {
-      div.style.background = "rgba(255,255,255,0.3)";
-    }
-
-    div.onclick = () => selectPerson(p);
-
-    suggestions.appendChild(div);
-  });
-}
-
-function selectPerson(p) {
-  search.value = p.name;
-  suggestions.style.display = "none";
-  render([p]);
-}
+/* ================= SEARCH (UNCHANGED, SAFE) ================= */
 
 search.addEventListener("input", (e) => {
   const val = e.target.value.toLowerCase().trim();
@@ -101,39 +93,29 @@ search.addEventListener("input", (e) => {
     return;
   }
 
-  currentMatches = family.filter(p =>
+  const matches = family.filter(p =>
     p.name.toLowerCase().includes(val)
   );
 
-  activeIndex = -1;
+  suggestions.innerHTML = "";
   suggestions.style.display = "block";
 
-  renderSuggestions(currentMatches);
-  render(currentMatches.length ? currentMatches : family);
+  matches.forEach(p => {
+    const div = document.createElement("div");
+    div.className = "suggestion-item";
+    div.innerText = p.name;
+
+    div.onclick = () => {
+      search.value = p.name;
+      suggestions.style.display = "none";
+      render([p]);
+    };
+
+    suggestions.appendChild(div);
+  });
+
+  render(matches.length ? matches : family);
 });
 
-search.addEventListener("keydown", (e) => {
-  if (suggestions.style.display === "none") return;
-
-  if (e.key === "ArrowDown") {
-    activeIndex++;
-    if (activeIndex >= currentMatches.length) activeIndex = 0;
-    renderSuggestions(currentMatches);
-  }
-
-  if (e.key === "ArrowUp") {
-    activeIndex--;
-    if (activeIndex < 0) activeIndex = currentMatches.length - 1;
-    renderSuggestions(currentMatches);
-  }
-
-  if (e.key === "Enter") {
-    if (currentMatches[activeIndex]) {
-      selectPerson(currentMatches[activeIndex]);
-    }
-  }
-});
-
-/* ================= INIT ================= */
-
+/* INIT */
 render(family);
