@@ -6,41 +6,48 @@ function getPerson(id) {
   return family.find(p => p.id === id);
 }
 
+function getChildren(id) {
+  return family.filter(p => p.father === id || p.mother === id);
+}
+
 function render(data = family) {
   tree.innerHTML = "";
 
-  const levels = {
-    1: [],
-    2: [],
-    3: []
-  };
+  const roots = data.filter(p => !p.father && !p.mother);
 
-  data.forEach(p => {
-    if (!p.father && !p.mother) levels[1].push(p);
-    else if (p.father && p.mother && p.id <= 4) levels[2].push(p);
-    else levels[3].push(p);
-  });
+  let used = new Set();
 
-  Object.values(levels).forEach(level => {
-    const div = document.createElement("div");
-    div.className = "level";
+  function makeLevel(list) {
+    const level = document.createElement("div");
+    level.className = "level";
 
-    level.forEach(p => {
+    list.forEach(p => {
+      if (used.has(p.id)) return;
+      used.add(p.id);
+
       const card = document.createElement("div");
       card.className = "card";
 
-      card.innerHTML = `
-        <img src="${p.image}">
-        <p>${p.name}</p>
-      `;
+      card.innerHTML = `<h3>${p.name}</h3>`;
 
       card.onclick = () => showProfile(p);
 
-      div.appendChild(card);
+      level.appendChild(card);
     });
 
-    tree.appendChild(div);
+    tree.appendChild(level);
+  }
+
+  // root generation
+  makeLevel(roots);
+
+  // children generation
+  let children = [];
+  roots.forEach(r => {
+    children = children.concat(getChildren(r.id));
   });
+
+  if (children.length) makeLevel(children);
 }
 
 function showProfile(p) {
@@ -57,7 +64,7 @@ function showProfile(p) {
   `;
 }
 
-search.addEventListener("input", e => {
+search.addEventListener("input", (e) => {
   const val = e.target.value.toLowerCase();
 
   const filtered = family.filter(p =>
@@ -68,4 +75,3 @@ search.addEventListener("input", e => {
 });
 
 render();
-renderTree();
