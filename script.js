@@ -17,22 +17,23 @@ function render() {
 
   const roots = family.filter(p => !p.father && !p.mother);
 
-  let allCards = [];
+  const allNodes = [];
 
-  function makeLevel(list) {
+  function createLevel(list) {
     const level = document.createElement("div");
     level.className = "level";
 
     list.forEach(p => {
       const card = document.createElement("div");
       card.className = "card";
-      card.setAttribute("data-name", p.name.toLowerCase());
+      card.dataset.name = p.name.toLowerCase();
+      card.dataset.id = p.id;
 
       card.innerHTML = `<h3>${p.name}</h3>`;
 
       card.onclick = () => showProfile(p);
 
-      allCards.push({ person: p, element: card });
+      allNodes.push({ person: p, el: card });
 
       level.appendChild(card);
     });
@@ -40,36 +41,31 @@ function render() {
     tree.appendChild(level);
   }
 
-  makeLevel(roots);
+  createLevel(roots);
 
   let children = [];
   roots.forEach(r => {
     children = children.concat(getChildren(r.id));
   });
 
-  makeLevel(children);
+  createLevel(children);
 
-  setTimeout(() => drawLines(allCards), 150);
+  setTimeout(() => drawLines(allNodes), 200);
 }
 
-function drawLines(allCards) {
+function drawLines(nodes) {
   svg.innerHTML = "";
 
-  allCards.forEach(item => {
-    const child = item.person;
+  nodes.forEach(n => {
+    if (!n.person.father) return;
 
-    if (!child.father) return;
+    const parent = nodes.find(x => x.person.id === n.person.father);
+    if (!parent) return;
 
-    const parentItem = allCards.find(x => x.person.id === child.father);
-    if (!parentItem) return;
-
-    const parentEl = parentItem.element;
-    const childEl = item.element;
+    const r1 = parent.el.getBoundingClientRect();
+    const r2 = n.el.getBoundingClientRect();
 
     const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-
-    const r1 = parentEl.getBoundingClientRect();
-    const r2 = childEl.getBoundingClientRect();
 
     line.setAttribute("x1", r1.left + r1.width / 2);
     line.setAttribute("y1", r1.top + r1.height);
@@ -97,18 +93,29 @@ function showProfile(p) {
   `;
 }
 
-/* 🔥 REAL SEARCH FIX */
+/* 🔥 SIMPLE & GUARANTEED SEARCH */
 search.addEventListener("input", (e) => {
-  const val = e.target.value.toLowerCase();
+  const val = e.target.value.trim().toLowerCase();
 
   document.querySelectorAll(".card").forEach(card => {
-    const name = card.getAttribute("data-name");
+    const name = card.dataset.name || "";
+
+    if (!val) {
+      card.style.display = "block";
+      return;
+    }
 
     if (name.includes(val)) {
       card.style.display = "block";
     } else {
-      card.style.display = val ? "none" : "block";
+      card.style.display = "none";
     }
+  });
+
+  // hide empty levels (optional clean look)
+  document.querySelectorAll(".level").forEach(level => {
+    const visibleCards = [...level.children].some(c => c.style.display !== "none");
+    level.style.display = visibleCards ? "flex" : "none";
   });
 });
 
