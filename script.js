@@ -23,8 +23,7 @@ function render() {
     let children = family.filter(c => c.father === parent.id);
 
     // 👉 sorting (old → young assumption via id reverse)
-    children = children.sort((a, b) => b.id - a.id);
-
+    children = children.sort((a, b) => a.id - b.id);
     const block = document.createElement("div");
     block.className = "family-block";
 
