@@ -1,72 +1,68 @@
 const tree = document.getElementById("tree");
+const profile = document.getElementById("profile");
 const search = document.getElementById("search");
 const suggestions = document.getElementById("suggestions");
-const profile = document.getElementById("profile");
 
 function getPerson(id) {
   return family.find(p => p.id === id);
 }
 
 function getChildren(id) {
-  return family.filter(p => p.father === id);
+  return family.filter(p => p.father === id || p.mother === id);
 }
 
-/* TREE */
-function render(data = family) {
+/* ================= SIMPLE TREE ================= */
+
+function render(list = family) {
   tree.innerHTML = "";
 
   const roots = family.filter(p => !p.father && !p.mother);
 
-  let levels = [];
-  levels.push(roots);
+  let secondLevel = [];
 
-  let current = roots;
+  function makeLevel(items) {
+    const level = document.createElement("div");
+    level.className = "level";
 
-  for (let i = 0; i < 5; i++) {
-    let next = [];
-
-    current.forEach(p => {
-      next.push(...getChildren(p.id));
-    });
-
-    if (next.length === 0) break;
-
-    levels.push(next);
-    current = next;
-  }
-
-  levels.forEach(level => {
-    const div = document.createElement("div");
-    div.className = "level";
-
-    level.forEach(p => {
+    items.forEach(p => {
       const card = document.createElement("div");
       card.className = "card";
-      card.innerText = p.name;
+      card.innerHTML = `<b>${p.name}</b>`;
 
       card.onclick = () => showProfile(p);
 
-      div.appendChild(card);
+      level.appendChild(card);
     });
 
-    tree.appendChild(div);
+    tree.appendChild(level);
+  }
+
+  makeLevel(roots);
+
+  roots.forEach(r => {
+    secondLevel = secondLevel.concat(getChildren(r.id));
   });
+
+  if (secondLevel.length) makeLevel(secondLevel);
 }
 
-/* PROFILE */
+/* ================= PROFILE ================= */
+
 function showProfile(p) {
+  profile.classList.remove("hidden");
+
   profile.innerHTML = `
     <h2>${p.name}</h2>
     <p>👨 বাবা: ${getPerson(p.father)?.name || "অজানা"}</p>
     <p>👩 মা: ${getPerson(p.mother)?.name || "অজানা"}</p>
+    <button onclick="profile.classList.add('hidden')">বন্ধ করুন</button>
   `;
 }
 
-/* SEARCH */
-search.addEventListener("input", (e) => {
-  const val = e.target.value.toLowerCase();
+/* ================= BASIC SEARCH ================= */
 
-  suggestions.innerHTML = "";
+search.addEventListener("input", (e) => {
+  const val = e.target.value.toLowerCase().trim();
 
   if (!val) {
     suggestions.style.display = "none";
@@ -78,6 +74,7 @@ search.addEventListener("input", (e) => {
     p.name.toLowerCase().includes(val)
   );
 
+  suggestions.innerHTML = "";
   suggestions.style.display = "block";
 
   matches.forEach(p => {
@@ -97,4 +94,5 @@ search.addEventListener("input", (e) => {
   render(matches.length ? matches : family);
 });
 
+/* INIT */
 render(family);
