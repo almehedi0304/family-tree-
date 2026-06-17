@@ -56,3 +56,27 @@ input {
 .suggestion-item:hover {
   background: rgba(255,255,255,0.2);
 }
+.family-block {
+  margin: 25px auto;
+  text-align: center;
+}
+
+.parent-box {
+  background: rgba(0, 200, 255, 0.2);
+  padding: 12px;
+  border-radius: 12px;
+  font-weight: bold;
+  width: 220px;
+  margin: auto;
+}
+
+.level {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.child-card {
+  width: 120px;
+}
