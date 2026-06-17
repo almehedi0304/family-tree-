@@ -8,52 +8,55 @@ function getPerson(id) {
 }
 
 function getChildren(id) {
-  return family.filter(p => p.father === id || p.mother === id);
+  return family.filter(p => p.father === id);
 }
 
-/* ================= TREE LEVEL SYSTEM ================= */
+/* ================= GROUPED TREE ================= */
 
 function render(data = family) {
   tree.innerHTML = "";
 
-  let levels = [];
+  const parents = family.filter(p => !p.father && !p.mother);
 
-  let root = family.filter(p => !p.father && !p.mother);
-  levels.push(root);
+  parents.forEach(parent => {
+    const parentBlock = document.createElement("div");
+    parentBlock.className = "parent-block";
 
-  let current = root;
+    const parentCard = document.createElement("div");
+    parentCard.className = "card parent";
+    parentCard.innerHTML = `👨‍👩‍👧 ${parent.name}`;
 
-  // build levels step by step
-  for (let i = 0; i < 5; i++) {
-    let next = [];
+    parentCard.onclick = () => showProfile(parent);
 
-    current.forEach(p => {
-      let kids = getChildren(p.id);
-      next.push(...kids);
-    });
+    parentBlock.appendChild(parentCard);
 
-    if (next.length === 0) break;
+    const children = getChildren(parent.id);
 
-    levels.push(next);
-    current = next;
-  }
+    if (children.length > 0) {
+      const arrow = document.createElement("div");
+      arrow.innerText = "⬇";
+      arrow.style.fontSize = "20px";
+      arrow.style.margin = "5px";
 
-  // render levels
-  levels.forEach(level => {
-    const div = document.createElement("div");
-    div.className = "level";
+      parentBlock.appendChild(arrow);
 
-    level.forEach(p => {
-      const card = document.createElement("div");
-      card.className = "card";
-      card.innerHTML = `<b>${p.name}</b>`;
+      const childRow = document.createElement("div");
+      childRow.className = "level";
 
-      card.onclick = () => showProfile(p);
+      children.forEach(child => {
+        const card = document.createElement("div");
+        card.className = "card child";
+        card.innerHTML = child.name;
 
-      div.appendChild(card);
-    });
+        card.onclick = () => showProfile(child);
 
-    tree.appendChild(div);
+        childRow.appendChild(card);
+      });
+
+      parentBlock.appendChild(childRow);
+    }
+
+    tree.appendChild(parentBlock);
   });
 }
 
@@ -70,7 +73,7 @@ function showProfile(p) {
   `;
 }
 
-/* ================= SEARCH ================= */
+/* ================= SEARCH (SIMPLE SAFE) ================= */
 
 search.addEventListener("input", (e) => {
   const val = e.target.value.toLowerCase().trim();
