@@ -1,7 +1,7 @@
 const tree = document.getElementById("tree");
-const profile = document.getElementById("profile");
 const search = document.getElementById("search");
 const suggestions = document.getElementById("suggestions");
+const profile = document.getElementById("profile");
 
 function getPerson(id) {
   return family.find(p => p.id === id);
@@ -11,72 +11,60 @@ function getChildren(id) {
   return family.filter(p => p.father === id);
 }
 
-/* ================= GROUPED TREE ================= */
-
+/* TREE */
 function render(data = family) {
   tree.innerHTML = "";
 
-  const parents = family.filter(p => !p.father && !p.mother);
+  const roots = family.filter(p => !p.father && !p.mother);
 
-  parents.forEach(parent => {
-    const parentBlock = document.createElement("div");
-    parentBlock.className = "parent-block";
+  let levels = [];
+  levels.push(roots);
 
-    const parentCard = document.createElement("div");
-    parentCard.className = "card parent";
-    parentCard.innerHTML = `👨‍👩‍👧 ${parent.name}`;
+  let current = roots;
 
-    parentCard.onclick = () => showProfile(parent);
+  for (let i = 0; i < 5; i++) {
+    let next = [];
 
-    parentBlock.appendChild(parentCard);
+    current.forEach(p => {
+      next.push(...getChildren(p.id));
+    });
 
-    const children = getChildren(parent.id);
+    if (next.length === 0) break;
 
-    if (children.length > 0) {
-      const arrow = document.createElement("div");
-      arrow.innerText = "⬇";
-      arrow.style.fontSize = "20px";
-      arrow.style.margin = "5px";
+    levels.push(next);
+    current = next;
+  }
 
-      parentBlock.appendChild(arrow);
+  levels.forEach(level => {
+    const div = document.createElement("div");
+    div.className = "level";
 
-      const childRow = document.createElement("div");
-      childRow.className = "level";
+    level.forEach(p => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerText = p.name;
 
-      children.forEach(child => {
-        const card = document.createElement("div");
-        card.className = "card child";
-        card.innerHTML = child.name;
+      card.onclick = () => showProfile(p);
 
-        card.onclick = () => showProfile(child);
+      div.appendChild(card);
+    });
 
-        childRow.appendChild(card);
-      });
-
-      parentBlock.appendChild(childRow);
-    }
-
-    tree.appendChild(parentBlock);
+    tree.appendChild(div);
   });
 }
 
-/* ================= PROFILE ================= */
-
+/* PROFILE */
 function showProfile(p) {
-  profile.classList.remove("hidden");
-
   profile.innerHTML = `
     <h2>${p.name}</h2>
     <p>👨 বাবা: ${getPerson(p.father)?.name || "অজানা"}</p>
     <p>👩 মা: ${getPerson(p.mother)?.name || "অজানা"}</p>
-    <button onclick="profile.classList.add('hidden')">বন্ধ করুন</button>
   `;
 }
 
-/* ================= SEARCH (SIMPLE SAFE) ================= */
-
+/* SEARCH */
 search.addEventListener("input", (e) => {
-  const val = e.target.value.toLowerCase().trim();
+  const val = e.target.value.toLowerCase();
 
   suggestions.innerHTML = "";
 
@@ -109,5 +97,4 @@ search.addEventListener("input", (e) => {
   render(matches.length ? matches : family);
 });
 
-/* INIT */
 render(family);
