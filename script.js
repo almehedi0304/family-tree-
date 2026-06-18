@@ -8,7 +8,7 @@ function getPerson(id) {
 }
 
 function getChildren(id) {
-  return family.filter(p => p.father === id || p.mother === id);
+  return family.filter(p => p.father === id);
 }
 
 /* ================= SIMPLE TREE ================= */
