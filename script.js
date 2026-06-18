@@ -11,35 +11,28 @@ function getChildren(id) {
   return family.filter(p => p.father === id);
 }
 
-/* ================= SIMPLE TREE ================= */
+/* ================= TREE RENDER ================= */
 
 function render() {
   tree.innerHTML = "";
 
- const parents = family.filter(p => p.id === 1);
-  parents.forEach(parent => {
+  const roots = family.filter(p => p.father === null || p.id === 1);
 
-    // children collect
-    let children = family.filter(c => c.father === parent.id);
-children = children.sort((a, b) => a.id - b.id);
-    // 👉 sorting (old → young assumption via id reverse)
-    children = children.sort((a, b) => a.id - b.id);
+  roots.forEach(root => {
+
     const block = document.createElement("div");
     block.className = "family-block";
 
-    // 👨‍👩‍👧 PARENT BOX (father - mother)
+    // 👨 PARENT BOX
     const parentBox = document.createElement("div");
     parentBox.className = "parent-box";
+    parentBox.innerHTML = `<b>${root.name}</b>`;
 
-    const mother = family.find(p => p.id === 2); // static mother (as per your data)
-
-    parentBox.innerHTML = `
-      <b>${parent.name} - ${mother?.name || "মা নেই"}</b>
-    `;
-
-    parentBox.onclick = () => showProfile(parent);
+    parentBox.onclick = () => showProfile(root);
 
     block.appendChild(parentBox);
+
+    const children = getChildren(root.id).sort((a, b) => a.id - b.id);
 
     // ⬇ arrow
     if (children.length > 0) {
@@ -49,11 +42,11 @@ children = children.sort((a, b) => a.id - b.id);
       block.appendChild(arrow);
     }
 
-    // 👶 CHILDREN ROW (left → right)
+    // 👶 CHILD ROW
     const childRow = document.createElement("div");
     childRow.className = "level";
 
-    childRow.appendChild(card);
+    children.forEach(child => {
       const card = document.createElement("div");
       card.className = "card child-card";
       card.innerText = child.name;
@@ -64,16 +57,48 @@ children = children.sort((a, b) => a.id - b.id);
     });
 
     block.appendChild(childRow);
-
     tree.appendChild(block);
   });
 }
+
+/* ================= PROFILE ================= */
+
 function showProfile(p) {
   profile.innerHTML = `
     <h2>${p.name}</h2>
     <p>👨 বাবা: ${getPerson(p.father)?.name || "অজানা"}</p>
-    <p>👩 মা: ${getPerson(p.mother)?.name || "অজানা"}</p>
   `;
 }
 
+/* ================= SEARCH ================= */
+
+search.addEventListener("input", function () {
+  const val = this.value.toLowerCase();
+  suggestions.innerHTML = "";
+
+  if (!val) return;
+
+  const matches = family.filter(p =>
+    p.name.toLowerCase().includes(val)
+  );
+
+  matches.forEach(m => {
+    const div = document.createElement("div");
+    div.innerText = m.name;
+    div.style.cursor = "pointer";
+    div.style.padding = "5px";
+
+    div.onclick = () => {
+      showProfile(m);
+      suggestions.innerHTML = "";
+      search.value = m.name;
+    };
+
+    suggestions.appendChild(div);
+  });
+});
+
+/* ================= INIT ================= */
+
+render();
 render();
