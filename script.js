@@ -53,7 +53,7 @@ children = children.sort((a, b) => a.id - b.id);
     const childRow = document.createElement("div");
     childRow.className = "level";
 
-    children.forEach(child => {
+    childRow.appendChild(card);
       const card = document.createElement("div");
       card.className = "card child-card";
       card.innerText = child.name;
